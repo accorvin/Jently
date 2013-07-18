@@ -17,10 +17,19 @@ module PullRequestsData
   end
 
   def PullRequestsData.update(repo_name, pull_request_data)
+    id = pull_request_data[:id]
     data = read
-    data[pull_request[repo_name][:id]] = pull_request_data[:id]
-    data[pull_request[repo_name][:id]][:priority] = get_new_priority(repo_name, pull_request_data)
-    data[pull_request[repo_name][:id]][:is_test_required] = test_required?(repo_name, pull_request_data)
+    
+    if !data.has_key?(repo_name)
+      data[repo_name] = Hash.new
+    end
+    if !data[repo_name].has_key?(id)
+      data[repo_name][id] = pull_request_data
+    end
+    
+    data[repo_name][id][id] = id
+    data[repo_name][id][:priority] = get_new_priority(repo_name, pull_request_data)
+    data[repo_name][id][:is_test_required] = test_required?(repo_name, pull_request_data)
     write(data)
   end
 
@@ -46,6 +55,7 @@ module PullRequestsData
 
   def PullRequestsData.outdated_success_status?(repo_name, pull_request_data)
     data = read
+    is_job_new = !data.has_key?(repo_name)
     if is_job_new
       is_new = true
     else
@@ -70,7 +80,12 @@ module PullRequestsData
       is_new = !job.has_key?(pull_request_data[:id])
     end
     
-    priority = (is_new) ? 0 : (data[repo_name][pull_request_data[:id]][:priority] + 1)
+    if is_new
+      priority = 0
+    else
+      priority = data[repo_name][pull_request_data[:id]][:priority] + 1
+    end
+    priority
   end
 
   def PullRequestsData.test_required?(repo_name, pull_request_data)
@@ -102,7 +117,7 @@ module PullRequestsData
     is_test_required = is_new || is_waiting_to_be_tested || has_inconsistent_status || has_invalid_status || (has_valid_status && was_updated)
   end
 
-  def PullRequestsData.get_pull_request_id_to_test(open_pull_requests)
+  def PullRequestsData.get_pull_request_to_test(open_pull_requests)
     data = read
     config = ConfigFile.read
     pull_requests_that_require_testing = []
@@ -112,14 +127,15 @@ module PullRequestsData
       repo_name = pull.repository.repository_name
       if data[repo_name][pull.pull_request_id][:is_test_required]
         pull_requests_that_require_testing[testing_pulls_count] = pull
+        testing_pulls_count += 1
       end
     end
 
-    pull_request_id_to_test = (pull_requests_that_require_testing.empty?) ? nil : get_hightest_priority_pull_request(data, pullrequests_that_require_testing).pull_request_id
+    pull_request_to_test = (testing_pulls_count == 0) ? nil : get_highest_priority_pull_request(data, pull_requests_that_require_testing)
   end
   
-  def get_hightest_priority_pull_request(data, pull_requests_that_require_testing)
-    max_priority_pull
+  def PullRequestsData.get_highest_priority_pull_request(data, pull_requests_that_require_testing)
+    max_priority_pull = nil
     pull_requests_that_require_testing.each do |pull|
       if max_priority_pull.nil?
         max_priority_pull = pull

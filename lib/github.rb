@@ -61,7 +61,7 @@ module Github
 
   def Github.set_pull_request_status(repository_id, pull_request_id, state)
     begin
-      head_sha = PullRequestsData.read[pull_request_id][:head_sha]
+      head_sha = PullRequestsData.read[repository_id][pull_request_id][:head_sha]
 
       opts = {}
       opts[:target_url] = state[:url] if !state[:url].nil?
