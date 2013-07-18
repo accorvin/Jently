@@ -31,17 +31,17 @@ module Jenkins
     "#{pull_request_id}-#{(Time.now.to_f * 1000000).to_i}"
   end
 
-  def Jenkins.start_job(pull_request_id)
+  def Jenkins.start_job(jenkins_job_name, pull_request_id, branch_name)
     begin
       config = ConfigFile.read
-      connection = Jenkins.new_connection("#{config[:jenkins_url]}/job/#{config[:jenkins_job_name]}/buildWithParameters", config)
+      connection = Jenkins.new_connection("#{config[:jenkins_url]}/job/#{jenkins_job_name}/buildWithParameters?delay=0sec", config)
 
       job_id = new_job_id(pull_request_id)
       connection.post do |req|
+        req.params[:branch] = branch_name
         req.params[:id] = job_id
-        req.params[:branch] = config[:testing_branch_name]
-        req.params[:repository] = config[:github_ssh_repository]
       end
+
       job_id
     rescue => e
       Logger.log('Error when starting job', e)
@@ -50,19 +50,19 @@ module Jenkins
     end
   end
 
-  def Jenkins.wait_on_job(job_id)
+  def Jenkins.wait_on_job(jenkins_job_name, job_id)
     config = ConfigFile.read
     while true
-      state = get_job_state(job_id)
+      state = get_job_state(jenkins_job_name, job_id)
       return state if !state.nil?
       sleep config[:jenkins_polling_interval_seconds]
     end
   end
 
-  def Jenkins.get_job_state(job_id)
+  def Jenkins.get_job_state(jenkins_job_name, job_id)
     begin
       config = ConfigFile.read
-      connection = Jenkins.new_connection("#{config[:jenkins_url]}/job/#{config[:jenkins_job_name]}/api/json", config, :use_json => true)
+      connection = Jenkins.new_connection("#{config[:jenkins_url]}/job/#{jenkins_job_name}/api/json", config, :use_json => true)
 
       response = connection.get do |req|
         req.params[:depth] = 1
@@ -72,7 +72,7 @@ module Jenkins
       state = nil
       response.body[:builds].each do |build|
         begin
-          if build[:actions][0][:parameters][2][:value] == job_id
+          if build[:actions][0][:parameters][1][:value] == job_id
             if !build[:building]
               state = {:status => 'success', :url => build[:url]} if build[:result] == 'SUCCESS'
               state = {:status => 'failure', :url => build[:url]} if build[:result] == 'UNSTABLE'

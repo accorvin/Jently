@@ -22,4 +22,21 @@ module Repository
     repository_path = get_path
     File.directory?(repository_path)
   end
+  
+  def Repository.get_repositories_to_test
+    config = ConfigFile.read
+    repositories_data = []
+    job_count = 0
+    jobs = config[:jobs].split(',')
+    
+    jobs.each do |job|
+      job_parts = job.split('=>')
+      repository_name = job_parts[0]
+      jenkins_job_name = job_parts[1]
+      repositories_data[job_count] = RepositoryData.new(repository_name, jenkins_job_name)
+      job_count = job_count + 1
+    end
+    
+    return repositories_data  
+  end
 end

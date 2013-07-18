@@ -6,6 +6,8 @@ require './lib/helpers/logger.rb'
 require './lib/helpers/repository.rb'
 require './lib/helpers/config_file.rb'
 require './lib/helpers/pull_requests_data.rb'
+require './lib/helpers/pull_request.rb'
+require './lib/helpers/repository_data.rb'
 
 while true
   begin
