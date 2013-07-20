@@ -112,3 +112,4 @@ module Jenkins
     connection
   end
 end
+
