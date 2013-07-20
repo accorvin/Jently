@@ -12,10 +12,10 @@ module Core
       end
 
       if pull_request[:mergeable] == true
-        Jenkins.wait_for_idle_executor
+        #Jenkins.wait_for_idle_executor
 
         Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.'})
-        job_id = Jenkins.start_job(jenkins_job_name, pull_id, pull_request[:head_branch])
+        job_id = Jenkins.start_job(jenkins_job_name, pull_id, pull_request[:head_branch], repo_name)
         state = Jenkins.wait_on_job(jenkins_job_name, job_id)
 
         Github.set_pull_request_status(repo_name, pull_id, thr.value)

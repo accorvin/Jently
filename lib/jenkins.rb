@@ -31,7 +31,7 @@ module Jenkins
     "#{pull_request_id}-#{(Time.now.to_f * 1000000).to_i}"
   end
 
-  def Jenkins.start_job(jenkins_job_name, pull_request_id, branch_name)
+  def Jenkins.start_job(jenkins_job_name, pull_request_id, branch_name, repo_name)
     begin
       config = ConfigFile.read
       connection = Jenkins.new_connection("#{config[:jenkins_url]}/job/#{jenkins_job_name}/buildWithParameters?delay=0sec", config)
@@ -45,6 +45,7 @@ module Jenkins
       job_id
     rescue => e
       Logger.log('Error when starting job', e)
+      Github.set_pull_request_status(repo_name, pull_request_id, {:status => 'error', :description => 'A Jenkins build error has occurred. This pull request will be automatically rescheduled for testing.'})
       sleep 5
       retry
     end
