@@ -18,7 +18,7 @@ module Core
         job_id = Jenkins.start_job(jenkins_job_name, pull_id, pull_request[:head_branch], repo_name)
         state = Jenkins.wait_on_job(jenkins_job_name, job_id)
 
-        Github.set_pull_request_status(repo_name, pull_id, thr.value)
+        Github.set_pull_request_status(repo_name, pull_id, state)
 #        if timeout
 #          Github.set_pull_request_status(pull_id, {:status => 'error', :description => 'Jenkins build timed out.'})
 #        else
