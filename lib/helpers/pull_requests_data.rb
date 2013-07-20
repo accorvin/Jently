@@ -30,6 +30,7 @@ module PullRequestsData
     data[repo_name][id][id] = id
     data[repo_name][id][:priority] = get_new_priority(repo_name, pull_request_data)
     data[repo_name][id][:is_test_required] = test_required?(repo_name, pull_request_data)
+    data[repo_name][id][:status] = pull_request_data[:status]
     write(data)
   end
 
