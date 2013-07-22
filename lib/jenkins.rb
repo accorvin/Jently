@@ -76,9 +76,6 @@ module Jenkins
           if build[:actions][0][:parameters][1][:value] == job_id
             if !build[:building]
               url = build[:url]
-              index = url.index('/job/')
-              url = url[index..-1]
-              url = url.insert(0, config[:jenkins_url])
               state = {:status => 'success', :url => url} if build[:result] == 'SUCCESS'
               state = {:status => 'failure', :url => url} if build[:result] == 'UNSTABLE'
               state = {:status => 'failure', :url => url} if build[:result] == 'FAILURE'
