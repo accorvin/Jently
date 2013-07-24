@@ -71,18 +71,18 @@ module Github
       client = Github.new_client
       client.create_status(repository_id, head_sha, state[:status], opts)
 
-      PullRequestsData.update_status(repository_id, pull_request_id, state[:status])
-
-      if state[:status] == 'success' || state[:status] == 'failure'
-        PullRequestsData.reset(repository_id, pull_request_id)
-      end
-      
       if state[:status] == 'failure'
         comment = "The Jenkins build for this pull request failed. See #{opts[:target_url]} for more details."
         client.create_commit_comment(repository_id, head_sha, comment)
       elsif state[:status] == 'success'
         comment = "This pull request was successfully tested in Jenkins. see #{opts[:target_url]} for more details."
         client.create_commit_comment(repository_id, head_sha, comment)
+      end
+
+      PullRequestsData.update_status(repository_id, pull_request_id, state[:status])
+
+      if state[:status] == 'success' || state[:status] == 'failure'
+        PullRequestsData.reset(repository_id, pull_request_id)
       end
     rescue => e
       Logger.log('Error when setting pull request status', e)
