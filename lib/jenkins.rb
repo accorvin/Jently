@@ -79,7 +79,7 @@ module Jenkins
               index = url.index('/job/')
               url = url[index..-1]
               url = url.insert(0, config[:jenkins_url])
-              state = {:status => 'success', :url => url} if build[:result] == 'SUCCESS'
+              state = {:status => 'success', :description => Jenkins.get_success_status(), :url => url} if build[:result] == 'SUCCESS'
               state = {:status => 'failure', :url => url} if build[:result] == 'UNSTABLE'
               state = {:status => 'failure', :url => url} if build[:result] == 'FAILURE'
             end
@@ -110,6 +110,15 @@ module Jenkins
       connection.basic_auth(config[:jenkins_login], config[:jenkins_password])
     end
     connection
+  end
+
+  def Jenkins.get_success_status()
+    statuses = [
+      'By jove, old bean, I believe this build is a success!',
+      'I say, old fruit, I cannot believe this is working!'
+    ]
+
+    return statuses.sample
   end
 end
 

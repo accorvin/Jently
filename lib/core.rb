@@ -14,7 +14,8 @@ module Core
       if pull_request[:mergeable] == true
         #Jenkins.wait_for_idle_executor
 
-        Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.'})
+        Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.', :url => "#{config[:jenkins_url]}/job/#{jenkins_job_name}"})
+        Logger.log("Building #{config[:jenkins_url]}/job/#{jenkins_job_name}")
         job_id = Jenkins.start_job(jenkins_job_name, pull_id, pull_request[:head_branch], repo_name)
         state = Jenkins.wait_on_job(jenkins_job_name, job_id)
 
@@ -41,7 +42,7 @@ module Core
       repo_name = pull_request.repository.repository_name
       pull_request.set_data(pull_request_data)
       if PullRequestsData.outdated_success_status?(repo_name, pull_request_data)
-        Github.set_pull_request_status(repo_name, pull_request_data[:id], {:status => 'success', :description => "This has been rescheduled for testing as the '#{pull_request[:base_branch]}' branch has been updated."})
+        Github.set_pull_request_status(repo_name, pull_request_data[:id], {:status => 'success', :description => "This has been rescheduled for testing as the '#{pull_request_data[:base_branch]}' branch has been updated."})
       end
       PullRequestsData.update(repo_name, pull_request_data)
     end

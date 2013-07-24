@@ -10,6 +10,7 @@ module Github
       pull_count = 0
       
       repositories.each do |repo|
+        Logger.log("Checking for pull requests for #{repo.repository_name}")
         open_pull_requests = client.pull_requests(repo.repository_name, 'open')
         open_pull_requests_ids = open_pull_requests.collect { |pull_request| pull_request.number }
         open_pull_requests_ids.each do |id|
