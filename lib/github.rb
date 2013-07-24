@@ -78,11 +78,11 @@ module Github
       end
       
       if state[:status] == 'failure'
-        comment = "The Jenkins build for this pull request failed."
-      else
-        comment = "This pull request was successfull tested in Jenkins."
+        comment = "The Jenkins build for this pull request failed. See #{opts[:target_url]} for more details."
+      else if state[:status] == 'success'
+        comment = "This pull request was successfully tested in Jenkins. see #{opts[:target_url]} for more details."
       end
-      client.create_commit_comment(repository_id, head_sha, comment, options = opts)
+      client.create_commit_comment(repository_id, head_sha, comment)
     rescue => e
       Logger.log('Error when setting pull request status', e)
       sleep 5
