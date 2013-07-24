@@ -40,10 +40,10 @@ module PullRequestsData
     open_pull_requests.each do |pull|
       repo_name = pull.repository.repository_name
       pull_id = pull.pull_request_id
-      if (!repo_pulls_hash.has_key?(repo_name))
-        repo_pulls_hash[repo_name] = Array.new
+      if (!open_pulls_hash.has_key?(repo_name))
+        open_pulls_hash[repo_name] = Array.new
       end
-      repo_pulls_hash[repo_name].push(pull_id)
+      open_pulls_hash[repo_name].push(pull_id)
     end
 
     data = read
@@ -54,9 +54,9 @@ module PullRequestsData
       if (!open_pulls_hash.has_key?(repo))
         data.delete(repo)
       else
-        repo_pulls = open_pulls_hash[repo]
-        repo.keys.each do |pull|
-          if (!repo_pulls.include?(pull))
+        open_repo_pulls = open_pulls_hash[repo]
+        data_copy[repo].keys.each do |pull|
+          if (open_repo_pulls.include?(pull))
             data[repo].delete(pull)
           end
         end
