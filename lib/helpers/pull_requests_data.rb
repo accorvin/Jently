@@ -56,7 +56,7 @@ module PullRequestsData
       else
         open_repo_pulls = open_pulls_hash[repo]
         data_copy[repo].keys.each do |pull|
-          if (open_repo_pulls.include?(pull))
+          if (!open_repo_pulls.include?(pull))
             data[repo].delete(pull)
           end
         end
