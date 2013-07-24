@@ -76,6 +76,13 @@ module Github
       if state[:status] == 'success' || state[:status] == 'failure'
         PullRequestsData.reset(repository_id, pull_request_id)
       end
+      
+      if state[:status] == 'failure'
+        comment = "The Jenkins build for this pull request failed."
+      else
+        comment = "This pull request was successfull tested in Jenkins."
+      end
+      client.create_commit_comment(repository_id, head_sha, comment, options = opts)
     rescue => e
       Logger.log('Error when setting pull request status', e)
       sleep 5
