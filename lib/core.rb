@@ -34,8 +34,7 @@ module Core
 
   def Core.poll_pull_requests_and_queue_next_job
     open_pull_requests = Github.get_open_pulls
-    #todo: fix this, won't work right now with multiple jobs in the configuration
-    #PullRequestsData.remove_dead_pull_requests(open_pull_requests)
+    PullRequestsData.remove_dead_pull_requests(open_pull_requests)
 
     open_pull_requests.each do |pull_request|
       pull_request_data = Github.get_pull_request_data(pull_request)

@@ -35,9 +35,35 @@ module PullRequestsData
   end
 
   def PullRequestsData.remove_dead_pull_requests(open_pull_requests)
+    open_pulls_hash = Hash.new
+
+    open_pull_requests.each do |pull|
+      repo_name = pull.repository.repository_name
+      pull_id = pull.pull_request_id
+      if (!repo_pulls_hash.has_key?(repo_name))
+        repo_pulls_hash[repo_name] = Array.new
+      end
+      repo_pulls_hash[repo_name].push(pull_id)
+    end
+
     data = read
-    dead_pull_requests_ids = data.keys - open_pull_requests_ids
-    dead_pull_requests_ids.each { |id| data.delete(id) }
+
+    data_copy = data
+    existing_repositories = data_copy.keys
+    existing_repositories.each do |repo|
+      if (!open_pulls_hash.has_key?(repo))
+        data.delete(repo)
+      else
+        repo_pulls = open_pulls_hash[repo]
+        repo.keys.each do |pull|
+          if (!repo_pulls.include?(pull))
+            data[repo].delete(pull)
+          end
+        end
+      end
+      
+    end
+
     write(data)
   end
 

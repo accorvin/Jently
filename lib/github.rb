@@ -18,10 +18,6 @@ module Github
           pull_count = pull_count + 1
         end
       end
-#      repository_id = Repository.get_id
-
-#      open_pull_requests = client.pull_requests(repository_id, 'open')
-#      open_pull_requests_ids = open_pull_requests.collect { |pull_request| pull_request.number }
 
       return open_pulls
     rescue => e
