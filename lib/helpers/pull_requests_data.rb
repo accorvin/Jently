@@ -164,7 +164,7 @@ module PullRequestsData
     
     pull_request_comments.each do |comment|
       body = comment[:body].downcase
-      if (body.match('.go.jently.'))
+      if (body.match('.*go.*jently.*'))
         new_body = comment_strings.sample
         client.delete_comment(repo_name, comment[:id])
         client.add_comment(repo_name, pull_id, new_body)
