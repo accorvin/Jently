@@ -140,7 +140,10 @@ module PullRequestsData
     end
     
     if (!is_job_new)
-      if (data[repo_name][pull_request_data[:id]][:status] == 'pending')
+      pull_id = pull_request_data[:id]
+      if (data[repo_name][pull_id][:status] == 'pending')
+        client = Github.new_client
+        Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.'})
         return false
       end
     end
