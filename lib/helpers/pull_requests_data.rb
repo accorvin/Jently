@@ -131,6 +131,10 @@ module PullRequestsData
     is_waiting_to_be_tested = (is_new) ? false : data[repo_name][pull_request_data[:id]][:is_test_required]
     has_inconsistent_status = (is_new) ? false : data[repo_name][pull_request_data[:id]][:status] != pull_request_data[:status]
 
+    if (get_comment_status(repo_name, pull_request_data[:id]))
+      return true
+    end
+
     if ['pending'].include?(pull_request_data[:status])
       return false
     end
@@ -142,6 +146,25 @@ module PullRequestsData
                                      (data[repo_name][pull_request_data[:id]][:base_sha] != pull_request_data[:base_sha])
 
     is_test_required = is_new || is_waiting_to_be_tested || has_inconsistent_status || has_invalid_status || (has_valid_status && was_updated)
+  end
+  
+  def PullRequestsData.get_comment_status(repo_name, pull_id)
+    client = Github.new_client
+    pull_request_comments = client.issue_comments(repo_name, pull_id)
+    
+    if (pull_request_comments.empty?)
+      return false
+    end
+    
+    pull_request_comments.each do |comment|
+      if (comment[:body].downcase == "go jently")
+        new_body = "I'd follow you anywhere. -Jently"
+        client.update_comment(repo_name, comment[:id], new_body)
+        return true
+      end
+    end
+    
+    return false
   end
 
   def PullRequestsData.get_pull_request_to_test(open_pull_requests)
