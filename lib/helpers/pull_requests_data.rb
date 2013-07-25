@@ -151,7 +151,7 @@ module PullRequestsData
   def PullRequestsData.get_comment_status(repo_name, pull_id)
     comment_strings = [
       "I'd follow you anywhere. -Jently",
-      "I am happy to ablige, sir. -Jently",
+      "I am happy to oblige, sir. -Jently",
       "As you wish. -Jently"
     ]
 
