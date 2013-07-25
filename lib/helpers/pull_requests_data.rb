@@ -135,7 +135,7 @@ module PullRequestsData
       return true
     end
 
-    if ['pending'].include?(pull_request_data[:status])
+    if (pull_request_data[:status] == 'pending' || data[:status] == 'pending')
       return false
     end
     
