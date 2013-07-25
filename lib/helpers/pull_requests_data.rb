@@ -135,8 +135,14 @@ module PullRequestsData
       return true
     end
 
-    if (pull_request_data[:status] == 'pending' || data[:status] == 'pending')
+    if (pull_request_data[:status] == 'pending')
       return false
+    end
+    
+    if (!is_job_new)
+      if (data[repo_name][pull_request_data[:id]][:status] == 'pending')
+        return false
+      end
     end
     
     has_invalid_status = ['error', 'undefined'].include?(pull_request_data[:status])
