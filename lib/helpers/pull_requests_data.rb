@@ -159,7 +159,8 @@ module PullRequestsData
     pull_request_comments.each do |comment|
       if (comment[:body].downcase == "go jently")
         new_body = "I'd follow you anywhere. -Jently"
-        client.update_comment(repo_name, comment[:id], new_body)
+        client.delete_comment(repo_name, comment[:id])
+        client.add_comment(repo_name, pull_id, new_body)
         return true
       end
     end
