@@ -141,7 +141,7 @@ module PullRequestsData
       return false
     end
     
-    if (!is_job_new)
+    if (!is_new)
       pull_id = pull_request_data[:id]
       if (data[repo_name][pull_id][:status] == 'pending')
         client = Github.new_client
