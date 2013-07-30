@@ -131,8 +131,10 @@ module PullRequestsData
     is_waiting_to_be_tested = (is_new) ? false : data[repo_name][pull_request_data[:id]][:is_test_required]
     has_inconsistent_status = (is_new) ? false : data[repo_name][pull_request_data[:id]][:status] != pull_request_data[:status]
 
-    if (get_comment_status(repo_name, pull_request_data[:id]))
-      return true
+    if (!is_new)
+        if (get_comment_status(repo_name, pull_request_data[:id]))
+            return true
+        end
     end
 
     if (pull_request_data[:status] == 'pending')
