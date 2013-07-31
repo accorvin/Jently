@@ -91,6 +91,48 @@ module Jenkins
       retry
     end
   end
+  
+  def Jenkins.remove_pending_pulls(open_pull_requests)
+    new_open_pulls = open_pull_requests
+    data = JenkinsFile.read()
+    
+    open_pull_requests.each do |pull|
+      repo_name = pull.repository.repository_name
+      id = pull.pull_request_id
+      if (data.has_key?(repo_name))
+        if (data[repo_name].has_key?(id))
+          new_open_pulls.delete(pull)
+        end
+      end
+    end
+    
+    return new_open_pulls
+  end
+  
+  def Jenkins.add_pull_to_file(pull)
+    repo_name = pull.repository.repository_name
+    id = pull.pull_request_id
+    
+    data = JenkinsFile.read()
+    if (!data.has_key?(repo_name))
+      data[repo_name] = Hash.new()
+    end
+    data[repo_name][id] = true
+    JenkinsFile.write(data)
+  end
+  
+  def Jenkins.remove_pull_from_file(pull)
+    repo_name = pull.repository.repository_name
+    id = pull.pull_request_id
+    
+    data = JenkinsFile.read()
+    if (data.has_key?(repo_name))
+      if (data[repo_name].has_key?(id))
+        data[repo_name].delete(id)
+      end
+    end
+    JenkinsFile.write(data)
+  end
 
   def Jenkins.new_connection(url, config, opts = {})
     connection = Faraday.new(:url => url) do |c|

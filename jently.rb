@@ -8,6 +8,7 @@ require './lib/helpers/config_file.rb'
 require './lib/helpers/pull_requests_data.rb'
 require './lib/helpers/pull_request.rb'
 require './lib/helpers/repository_data.rb'
+require './lib/helpers/jenkins_file.rb'
 
 while true
   begin
