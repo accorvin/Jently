@@ -81,9 +81,7 @@ module Github
         PullRequestsData.reset(repository_id, pull_request_id)
       end
     rescue => e
-      Logger.log('Error when setting pull request status', e)
-      sleep 5
-      retry
+      Logger.log("Error when setting pull request status for pull #{pull_request_id} of project #{repository_id}", e)
     end
   end
 

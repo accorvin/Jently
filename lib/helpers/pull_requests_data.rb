@@ -132,18 +132,16 @@ module PullRequestsData
     return true if (get_comment_status(repo_name, pull_id))
 
     if (data[repo_name][pull_id][:status] == 'pending')
-        #client = Github.new_client
-        #Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.'})
         return false
     end
     
     has_invalid_status = ['error', 'undefined'].include?(pull_request_data[:status])
     has_valid_status = ['success', 'failure'].include?(pull_request_data[:status])
 
-    #was_updated = (data[repo_name][pull_request_data[:id]][:head_sha] != pull_request_data[:head_sha]) ||
+    was_updated = (data[repo_name][pull_request_data[:id]][:head_sha] != pull_request_data[:head_sha]) ||
                                      (data[repo_name][pull_request_data[:id]][:base_sha] != pull_request_data[:base_sha])
 
-    is_test_required = has_invalid_status# || (has_valid_status && was_updated)
+    is_test_required = has_invalid_status || (has_valid_status && was_updated)
   end
   
   def PullRequestsData.get_comment_status(repo_name, pull_id)

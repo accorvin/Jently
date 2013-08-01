@@ -22,11 +22,6 @@ module Core
 
         Github.set_pull_request_status(repo_name, pull_id, state)
         Jenkins.remove_pull_from_file(pull_request_object)
-#        if timeout
-#          Github.set_pull_request_status(pull_id, {:status => 'error', :description => 'Jenkins build timed out.'})
-#        else
-#          Github.set_pull_request_status(pull_id, thr.value)
-#        end
       end
     rescue => e
       Github.set_pull_request_status(repo_name, pull_request_object.pull_request_id, {:status => 'error', :description => 'A Jenkins build error has occurred. This pull request will be automatically rescheduled for testing.'})
