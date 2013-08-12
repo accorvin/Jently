@@ -30,7 +30,10 @@ module PullRequestsData
     data[repo_name][id][:priority] = get_new_priority(repo_name, pull_request_data)
     data[repo_name][id][:is_test_required] = test_required?(repo_name, pull_request_data)
     data[repo_name][id][:status] = pull_request_data[:status]
-    data[repo_name][id][:head_sha] = pull_request_data[:head_sha]
+    
+    if (pull_request_data[:status] != 'pending')
+      data[repo_name][id][:head_sha] = pull_request_data[:head_sha]
+    end
     write(data)
   end
 
