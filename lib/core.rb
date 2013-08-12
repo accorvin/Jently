@@ -37,9 +37,6 @@ module Core
       pull_request_data = Github.get_pull_request_data(pull_request)
       repo_name = pull_request.repository.repository_name
       pull_request.set_data(pull_request_data)
-      if PullRequestsData.outdated_success_status?(repo_name, pull_request_data)
-        Github.set_pull_request_status(repo_name, pull_request_data[:id], {:status => 'success', :description => "This has been rescheduled for testing as the '#{pull_request_data[:base_branch]}' branch has been updated."})
-      end
       PullRequestsData.update(repo_name, pull_request_data)
     end
 
