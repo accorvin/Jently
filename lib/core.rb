@@ -7,22 +7,14 @@ module Core
       pull_request = pull_request_object.data
       pull_id = pull_request_object.pull_request_id
 
-      if pull_request[:mergeable] == false
-        Github.set_pull_request_status(pull_id, {:status => 'failure', :description => 'Unmergeable pull request.'})
-      end
+      Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.', :url => "#{config[:jenkins_url]}/job/#{jenkins_job_name}"})
+      Jenkins.add_pull_to_file(pull_request_object)
+      Logger.log("Building #{config[:jenkins_url]}/job/#{jenkins_job_name}")
+      job_id = Jenkins.start_job(jenkins_job_name, pull_id, pull_request[:head_branch], repo_name)
+      state = Jenkins.wait_on_job(jenkins_job_name, job_id)
 
-      if pull_request[:mergeable] == true
-        #Jenkins.wait_for_idle_executor
-
-        Github.set_pull_request_status(repo_name, pull_id, {:status => 'pending', :description => 'Jenkins build started.', :url => "#{config[:jenkins_url]}/job/#{jenkins_job_name}"})
-        Jenkins.add_pull_to_file(pull_request_object)
-        Logger.log("Building #{config[:jenkins_url]}/job/#{jenkins_job_name}")
-        job_id = Jenkins.start_job(jenkins_job_name, pull_id, pull_request[:head_branch], repo_name)
-        state = Jenkins.wait_on_job(jenkins_job_name, job_id)
-
-        Github.set_pull_request_status(repo_name, pull_id, state)
-        Jenkins.remove_pull_from_file(pull_request_object)
-      end
+      Github.set_pull_request_status(repo_name, pull_id, state)
+      Jenkins.remove_pull_from_file(pull_request_object)
     rescue => e
       Github.set_pull_request_status(repo_name, pull_request_object.pull_request_id, {:status => 'error', :description => 'A Jenkins build error has occurred. This pull request will be automatically rescheduled for testing.'})
       Logger.log('Error when testing pull request', e)
